@@ -1,7 +1,8 @@
 package com.demo.service;
 
 import com.demo.dto.UserRegistrationDto;
-import com.demo.entity.User;
+import com.demo.model.User;
+
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.List;

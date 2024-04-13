@@ -2,9 +2,9 @@ package com.demo.service.impl;
 
 
 import com.demo.dto.UserRegistrationDto;
+import com.demo.model.Role;
+import com.demo.model.User;
 import com.demo.repository.UserRepository;
-import com.demo.entity.Role;
-import com.demo.entity.User;
 import com.demo.service.UserService;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
