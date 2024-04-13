@@ -17,7 +17,7 @@
         .nav-link .ms-1 {
         color: white;
         font-weight: 400;
-}
+        }
 
     </style>
 </head>
@@ -45,8 +45,23 @@
                         <li>
                             <hr class="dropdown-divider">
                         </li>
-                        <li><a class="dropdown-item" href="#">Sign out</a></li>
+
+                        <li> <a class="dropdown-item" sec:authorize="isAuthenticated()">
+                            <a href="javascript: document.logoutForm.submit()" class="dropdown-toggle">Log out</a>
+                            <form name="logoutForm" th:action="@{/logout}" method="post" th:hidden="true">
+                            <input hidden type="submit" value="Sign Out" />
+                            </form>
+                            
+                        </li>
+
+                        <ul class="nav navbar-nav navbar-right">
+                            <li></li>
+                            </li>
+                        </ul>
+
+
                     </ul>
+
                 </div>
 
                 <ul class="nav nav-pills flex-column mb-sm-auto mb-0 align-items-center align-items-sm-start" id="menu">
