@@ -1,5 +1,7 @@
 package com.demo.model;
 
+import java.util.Collection;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -22,8 +24,8 @@ public class Card {
   @Column(name = "card_id")
   private Long id;
 
-  @Column(name = "set_id")
-  private Long setId;
+  @ManyToMany(mappedBy = "cards")
+  private Collection<CardSet> cardSets;
 
   private String front;
   private String back;
