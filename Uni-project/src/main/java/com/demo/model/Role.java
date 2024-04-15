@@ -9,11 +9,12 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @Entity
-@Table(name = "role")
+@Table(name = "Role")
 public class Role {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   
    private Long id;
    private String name;
 

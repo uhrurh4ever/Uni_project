@@ -2,19 +2,22 @@ package com.demo.model;
 
 import jakarta.persistence.*;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.util.Collection;
 
 @Getter
 @Setter
+@NoArgsConstructor
 @Entity
-@Table(name = "my_user", uniqueConstraints =
+@Table(name = "User", uniqueConstraints =
        @UniqueConstraint(columnNames = "email"))
 public class User {
 
    @Id
    @GeneratedValue(strategy = GenerationType.IDENTITY)
+   
    private Long id;
 
    @Column(name = "first_name")
@@ -36,10 +39,6 @@ public class User {
               (name = "role_id", 
                  referencedColumnName = "id"))
    private Collection<Role> roles;
-
-   public User() {
-
-   }
 
    public User(String firstName, String lastName, 
          String email, String password, 
