@@ -29,5 +29,4 @@ public class Card {
 
   private String front;
   private String back;
-  
 }
