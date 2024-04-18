@@ -1,8 +1,10 @@
 package com.demo.service.impl;
 
-import org.springframework.security.authentication.AuthenticationManager;
+import java.util.Collection;
+
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.stereotype.Service;
 
 import com.demo.exceptions.CardNotFoundException;
 import com.demo.exceptions.CardSetNotFoundException;
@@ -17,18 +19,21 @@ import com.demo.repository.CardRepository;
 
 @Getter
 @Setter
+@Service
 public class CardSetServiceImpl implements CardSetService {
 
   private CardSetRepository cardSetRepository;
   private CardRepository cardRepository;
-  private AuthenticationManager authenticationManager;
 
-  public CardSetServiceImpl(CardSetRepository cardSetRepository, CardRepository cardRepository, AuthenticationManager authenticationManager) {
+  public CardSetServiceImpl(CardSetRepository cardSetRepository, CardRepository cardRepository) {
     this.cardSetRepository = cardSetRepository;
     this.cardRepository = cardRepository;
-    this.authenticationManager = authenticationManager;
   }
 
+  @Override
+  public Collection<CardSet> getAllCardSets() {
+    return cardSetRepository.findAll();
+  }
 
   @Override
   public CardSet saveCardSet(CardSet cardSet) {
@@ -52,12 +57,19 @@ public class CardSetServiceImpl implements CardSetService {
   public void deleteCardSetById(Long id) {
     cardSetRepository.deleteById(id);
   }
-  @SuppressWarnings("unsed")
+ 
   @Override
   public void addCardToCardSet(Long cardSetId, Long cardId) throws CardNotFoundException, CardSetNotFoundException {
-    CardSet cardSet = getCardSetById(cardSetId);
-    Card card = cardRepository.findById(cardId)
-            .orElseThrow(() -> new CardNotFoundException(cardId));
+      CardSet cardSet = cardSetRepository.findById(cardSetId)
+              .orElseThrow(() -> new CardSetNotFoundException(cardSetId));
+      Card card = cardRepository.findById(cardId)
+              .orElseThrow(() -> new CardNotFoundException(cardId));
+  
+      Collection<Card> cards = cardSet.getCards();
+      cards.add(card);
+      cardSet.setCards(cards);
+  
+      cardSetRepository.save(cardSet);
   }
 
   @Override
@@ -73,5 +85,9 @@ public class CardSetServiceImpl implements CardSetService {
       cardRepository.delete(card);
       cardSetRepository.save(cardSet);
   }
+
+
+
+
 }
   

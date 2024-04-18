@@ -1,8 +1,12 @@
 package com.demo.service;
 
+import java.util.Collection;
+
 import com.demo.model.CardSet;
 
 public interface CardSetService  {
+  
+  Collection<CardSet> getAllCardSets();
 
   CardSet saveCardSet(CardSet cardSet);
 
@@ -15,5 +19,7 @@ public interface CardSetService  {
   void addCardToCardSet(Long cardSetId, Long cardId) throws Exception;
 
   void removeCardFromCardSet(Long cardSetId, Long cardId)  throws Exception;
+
+  
   
 }
