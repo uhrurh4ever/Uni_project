@@ -25,78 +25,75 @@ public class CardSetController {
         this.cardSetService = cardSetService;
     }
 
-    // Methods for handling card set operations
-
     @GetMapping
     public String getAllCardSets(Model model) {
-        Collection<CardSet> cardSets = cardSetService.getAllCardSets();  // Assuming getAllCardSets is implemented
+        Collection<CardSet> cardSets = cardSetService.getAllCardSets();  
         model.addAttribute("cardSets", cardSets);
-        return "card-sets";  // Replace with your Thymeleaf template name
+        return "card-sets";  
     }
 
     @GetMapping("/{id}")
     public String getCardSetById(@PathVariable Long id, Model model) throws Exception {
         CardSet cardSet = cardSetService.getCardSetById(id);
         model.addAttribute("cardSet", cardSet);
-        return "card-set-details";  // Replace with your Thymeleaf template name
+        return "card-set-details";  
     }
 
     @GetMapping("/new")
     public String showNewCardSetForm(Model model) {
-        model.addAttribute("cardSet", new CardSet());  // Create empty object for form binding
-        return "card-set-form";  // Replace with your Thymeleaf template name
+        model.addAttribute("cardSet", new CardSet());  
+        return "card-set-form";  
     }
 
     @PostMapping
     public String saveCardSet(@ModelAttribute CardSet cardSet) {
         cardSetService.saveCardSet(cardSet);
-        return "redirect:/card-sets";  // Redirect after saving
+        return "redirect:/card-sets";  
     }
 
     @GetMapping("/{id}/edit")
     public String showEditCardSetForm(@PathVariable Long id, Model model) throws Exception {
         CardSet cardSet = cardSetService.getCardSetById(id);
         model.addAttribute("cardSet", cardSet);
-        return "card-set-form";  // Replace with your Thymeleaf template name (can be the same as new form)
+        return "card-set-form";  
     }
 
     @PostMapping("/{id}/update")
     public String updateCardSet(@PathVariable Long id, @ModelAttribute CardSet cardSet) throws Exception {
-        cardSet.setId(id);  // Set the ID manually in case it's missing in the form data
+        cardSet.setId(id);  
         cardSetService.updateCardSet(cardSet);
-        return "redirect:/card-sets/" + id;  // Redirect after updating
+        return "redirect:/card-sets/" + id; 
     }
 
     @GetMapping("/{id}/delete")
     public String deleteCardSet(@PathVariable Long id) throws CardSetNotFoundException {
         cardSetService.deleteCardSetById(id);
-        return "redirect:/card-sets";  // Redirect after deleting
+        return "redirect:/card-sets";  
     }
 
-    // Methods for handling card management within card sets (optional)
+   
 
     @GetMapping("/{cardSetId}/cards")
     public String getCardsInCardSet(@PathVariable Long cardSetId, Model model) throws Exception {
         CardSet cardSet = cardSetService.getCardSetById(cardSetId);
-        // Logic to retrieve cards associated with the card set
-        Collection<Card> cards = cardSet.getCards();  // Assuming a getter method for cards exists
+        Collection<Card> cards = cardSet.getCards();  
         model.addAttribute("cardSet", cardSet);
         model.addAttribute("cards", cards);
-        return "card-set-cards";  // Replace with your Thymeleaf template name
+        return "card-set-cards";  
     }
 
     @GetMapping("/{cardSetId}/cards/add")
     public String showAddCardToCardSetForm(@PathVariable Long cardSetId, Model model) throws Exception {
         CardSet cardSet = cardSetService.getCardSetById(cardSetId);
         model.addAttribute("cardSet", cardSet);
-        model.addAttribute("card", new Card());  // Create empty object for form binding
-        return "card-set-add-card-form";  // Replace with your Thymeleaf template name
+        model.addAttribute("card", new Card());  
+        return "card-set-add-card-form";  
     }
 
     @PostMapping("/{cardSetId}/cards/add")
     public String addCardToCardSet(@PathVariable Long cardSetId, @ModelAttribute Card card) throws Exception {
-        cardSetService.addCardToCardSet(cardSetId, card.getId());  // Assuming card ID is retrieved elsewhere
-        return "redirect:/card-sets/" + cardSetId + "/cards";  // Redirect after adding card
+        cardSetService.addCardToCardSet(cardSetId, card.getId());  
+        return "redirect:/card-sets/" + cardSetId + "/cards";  
     }
   }
     
