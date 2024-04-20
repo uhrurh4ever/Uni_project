@@ -5,7 +5,8 @@ import com.demo.dto.UserRegistrationDto;
 import com.demo.model.Role;
 import com.demo.model.User;
 import com.demo.repository.UserRepository;
-import com.demo.service.UserService;
+import com.demo.service.interfaces.UserService;
+
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,55 +22,81 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
-   private UserRepository userRepository;
-   private BCryptPasswordEncoder passwordEncoder;
+    /**
+     * Репозиторий для работы с сущностью User
+     */
+    private UserRepository userRepository;
 
-   public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
-      super();
-      this.userRepository = userRepository;
-      this.passwordEncoder = passwordEncoder;
-   }
+    /**
+     * Bean для хэширования паролей
+     */
+    private BCryptPasswordEncoder passwordEncoder;
 
-   @Override
-   public User save(UserRegistrationDto registrationDto) {
-      
-      var user = new User(registrationDto.getFirstName(),
-                 registrationDto.getLastName(), 
-                  registrationDto.getEmail(),
-                   passwordEncoder.encode(registrationDto
-                          .getPassword()), 
-                   Arrays.asList(new Role("ROLE_ADMIN")));
+    public UserServiceImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
 
-      return userRepository.save(user);
-   }
+    /**
+     * Сохранение нового пользователя на основе данных регистрации
+     *
+     * @param registrationDto DTO-объект, содержащий данные регистрации (имя, фамилия, email, пароль)
+     * @return Сохраненный пользователь (объект User)
+     */
+    @Override
+    public User save(UserRegistrationDto registrationDto) {
+        User user = new User(
+                registrationDto.getFirstName(),
+                registrationDto.getLastName(),
+                registrationDto.getEmail(),
+                passwordEncoder.encode(registrationDto.getPassword()),
+                Arrays.asList(new Role("ROLE_ADMIN")) // Роль по умолчанию - ROLE_ADMIN
+        );
 
-   @Override
-   public UserDetails loadUserByUsername(String username)
-         throws UsernameNotFoundException {
+        return userRepository.save(user);
+    }
 
-      var user = userRepository.findByEmail(username);
-      if (user == null) {
-         throw new UsernameNotFoundException
-               ("Invalid username or password.");
-      }
-      return new org.springframework.security
-            .core.userdetails.User(user.getFirstName(),
-               user.getPassword(),
-           mapRolesToAuthorities(user.getRoles()));
-   }
+    /**
+     * Загрузка пользователя по email для Spring Security
+     *
+     * @param username Email пользователя
+     * @return UserDetails объект, представляющий информацию о пользователе для Spring Security
+     * @throws UsernameNotFoundException Ошибка, возникающая если пользователь с таким email не найден
+     */
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        User user = userRepository.findByEmail(username);
+        if (user == null) {
+            throw new UsernameNotFoundException("Wrong email or password.");
+        }
 
-   private Collection<? extends GrantedAuthority>
-          mapRolesToAuthorities(Collection<Role> roles) {
-      
-      return roles.stream()
-            .map(role -> new SimpleGrantedAuthority
-                  (role.getName()))
-            .collect(Collectors.toList());
-   }
+        return new org.springframework.security.core.userdetails.User(
+                user.getFirstName(),
+                user.getPassword(),
+                mapRolesToAuthorities(user.getRoles())
+        );
+    }
 
-   @Override
-   public List<User> getAll() {
-      
-      return userRepository.findAll();
-   }
+    /**
+     * Преобразование коллекции ролей пользователя в коллекцию GrantedAuthority для Spring Security
+     *
+     * @param roles Коллекция объектов Role, представляющая роли пользователя
+     * @return Коллекция объектов GrantedAuthority, необходимая для Spring Security
+     */
+    private Collection<? extends GrantedAuthority> mapRolesToAuthorities(Collection<Role> roles) {
+        return roles.stream()
+                .map(role -> new SimpleGrantedAuthority(role.getName()))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Получение всех пользователей из базы данных
+     *
+     * @return Список объектов User, представляющий всех пользователей
+     */
+    @Override
+    public List<User> getAll() {
+        return userRepository.findAll();
+    }
 }
+

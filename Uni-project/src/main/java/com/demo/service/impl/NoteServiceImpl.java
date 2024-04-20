@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 
 import com.demo.model.Note;
 import com.demo.repository.NoteRepository;
-import com.demo.service.NoteService;
+import com.demo.service.interfaces.NoteService;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -16,36 +16,67 @@ import lombok.Setter;
 @Service
 public class NoteServiceImpl implements NoteService {
 
-  private NoteRepository noteRepository;
+    /**
+     * Репозиторий для работы с сущностью Note
+     */
+    private NoteRepository noteRepository;
 
-  public NoteServiceImpl(NoteRepository noteRepository){
-    this.noteRepository = noteRepository;
-  }
+    public NoteServiceImpl(NoteRepository noteRepository) {
+        this.noteRepository = noteRepository;
+    }
 
-  @Override
-  public List <Note> getAllNotes() {
-    return noteRepository.findAll();
-    
-  }
+    /**
+     * Получение всех заметок
+     *
+     * @return Список объектов Note, представляющий все заметки в базе данных
+     */
+    @Override
+    public List<Note> getAllNotes() {
+        return noteRepository.findAll();
+    }
 
-  @Override
-  public Note saveNote(Note note) {
-    return noteRepository.save(note);
-  }
+    /**
+     * Сохранение заметки в базе данных
+     *
+     * @param note Объект Note, представляющий сохраняемую заметку
+     * @return Сохраненная заметка (объект Note)
+     */
+    @Override
+    public Note saveNote(Note note) {
+        return noteRepository.save(note);
+    }
 
-  @Override
-  public Note getNoteById(Long id) {
-    return noteRepository.findById(id).get();
-  }
+    /**
+     * Получение заметки по идентификатору
+     *
+     * @param id Идентификатор заметки
+     * @return Объект Note, представляющий найденную заметку,
+     *         или null, если заметка с таким идентификатором не найдена
+     */
+    @Override
+    public Note getNoteById(Long id) {
+        return noteRepository.findById(id).get();
+    }
 
-  @Override
-  public Note updateNote(Note note) {
-    return noteRepository.save(note);
-  }
+    /**
+     * Обновление заметки в базе данных
+     *
+     * @param note Объект Note, содержащий обновленные данные заметки
+     * @return Обновленная заметка (объект Note)
+     */
+    @Override
+    public Note updateNote(Note note) {
+        return noteRepository.save(note);
+    }
 
-  @Override
-  public void deleteNoteById(Long id) {
-    noteRepository.deleteById(id);
-  }
-
+    /**
+     * Удаление заметки из базы данных по идентификатору
+     *
+     * @param id Идентификатор заметки
+     */
+    @Override
+    public void deleteNoteById(Long id) {
+        noteRepository.deleteById(id);
+    }
 }
+

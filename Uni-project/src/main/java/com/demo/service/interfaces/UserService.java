@@ -1,4 +1,4 @@
-package com.demo.service;
+package com.demo.service.interfaces;
 
 import com.demo.dto.UserRegistrationDto;
 import com.demo.model.User;
@@ -10,5 +10,6 @@ import java.util.List;
 public interface UserService extends UserDetailsService {
    
    User save(UserRegistrationDto registrationDto);
+   
    List<User> getAll();
 }
