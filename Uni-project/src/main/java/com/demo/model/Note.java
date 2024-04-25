@@ -44,4 +44,7 @@ public class Note {
   private String text;
   private String tags;
 
+public Note(Topics topics){
+}
+
 }
