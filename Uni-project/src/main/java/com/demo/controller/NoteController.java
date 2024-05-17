@@ -2,6 +2,11 @@ package com.demo.controller;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,7 +16,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import com.demo.model.Note;
+import com.demo.model.User;
+import com.demo.repository.UserRepository;
 import com.demo.service.interfaces.NoteService;
+import com.demo.service.interfaces.UserService;
 
 @Controller
 @RequestMapping("/notes")
@@ -21,9 +29,14 @@ public class NoteController {
      * Сервис для работы с заметками
      */
     private NoteService noteService;
+    private UserRepository userRepository;
+    private UserService userService;
 
-    public NoteController(NoteService noteService) {
+
+    public NoteController(NoteService noteService,UserService userService, UserRepository userRepository) {
         this.noteService = noteService;
+        this.userService = userService;
+        this.userRepository = userRepository;
     }
 
     /**
@@ -59,10 +72,28 @@ public class NoteController {
      */
     @PostMapping
     public String saveNote(@ModelAttribute Note note) {
+        // Получаем аутентификацию из контекста безопасности
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        
+        // Получаем UserDetails для текущего пользователя
+        UserDetails userDetails = userService.loadUserByUsername(authentication.getName());
+
+        // Получаем email текущего пользователя из UserDetails
+        String email = userDetails.getUsername();
+
+        // Находим пользователя по email
+        User user = userRepository.findByEmail(email);
+        if (user == null) {
+            throw new UsernameNotFoundException("User not found");
+        }
+
+        // Устанавливаем пользователя для заметки и сохраняем ее
+        note.setUser(user);
         noteService.saveNote(note);
+
+        // Перенаправляем на страницу с заметками
         return "redirect:/notes";
     }
-
     /**
      * Обработка GET запроса на "/notes/{id}" (получение конкретной заметки по id)
      *

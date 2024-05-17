@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 @Service
 public class UserServiceImpl implements UserService {
 
+
+    
+
     /**
      * Репозиторий для работы с сущностью User
      */
@@ -71,7 +74,7 @@ public class UserServiceImpl implements UserService {
         }
 
         return new org.springframework.security.core.userdetails.User(
-                user.getFirstName(),
+                user.getEmail(), // Используйте email в качестве имени пользователя
                 user.getPassword(),
                 mapRolesToAuthorities(user.getRoles())
         );
@@ -94,9 +97,16 @@ public class UserServiceImpl implements UserService {
      *
      * @return Список объектов User, представляющий всех пользователей
      */
+     
     @Override
     public List<User> getAll() {
         return userRepository.findAll();
     }
+
+
+
+
+
+
 }
 

@@ -26,12 +26,11 @@ public class Note {
   private Long id;
   
   @ManyToOne(fetch = FetchType.LAZY)
-  @JoinColumn(name = "user_id", nullable = false)
+  @JoinColumn(name = "user_id", nullable = true)
   private User user;
 
-  @ManyToOne(fetch = FetchType.LAZY) 
-  @JoinColumn(name = "topic_id")
-  private Topics topic;
+
+  private String topic;
 
   private String name;
 
@@ -44,7 +43,9 @@ public class Note {
   private String text;
   private String tags;
 
-public Note(Topics topics){
+public Note(User user, String topic){
+  this.user = user;
+  this.topic = topic;
 }
 
 }
