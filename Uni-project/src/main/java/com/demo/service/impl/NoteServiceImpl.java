@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 
 import com.demo.model.Note;
+import com.demo.model.User;
 import com.demo.repository.NoteRepository;
 import com.demo.service.interfaces.NoteService;
 
@@ -77,6 +78,11 @@ public class NoteServiceImpl implements NoteService {
     @Override
     public void deleteNoteById(Long id) {
         noteRepository.deleteById(id);
+    }
+
+    @Override
+    public List<Note> getNotesByUser(User user) {
+        return noteRepository.findByUser(user);
     }
 }
 

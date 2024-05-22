@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,6 +14,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import com.demo.exceptions.AccessDeniedException;
 import com.demo.model.Note;
 import com.demo.model.User;
 import com.demo.repository.UserRepository;
@@ -25,9 +25,6 @@ import com.demo.service.interfaces.UserService;
 @RequestMapping("/notes")
 public class NoteController {
 
-    /**
-     * Сервис для работы с заметками
-     */
     private NoteService noteService;
     private UserRepository userRepository;
     private UserService userService;
@@ -39,37 +36,28 @@ public class NoteController {
         this.userRepository = userRepository;
     }
 
-    /**
-     * Обработка GET запроса на "/notes" (получение всех заметок)
-     *
-     * @param model Модель Spring MVC для передачи данных в представление
-     * @return Логическое имя представления "notes.html"
-     */
     @GetMapping
     public String getAllNotes(Model model) {
-        List<Note> notes = noteService.getAllNotes();
-        model.addAttribute("notes", notes);
-        return "notes";
+
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = userService.loadUserByUsername(authentication.getName());
+    String email = userDetails.getUsername();
+    User user = userRepository.findByEmail(email);
+    if (user == null) {
+        throw new UsernameNotFoundException("User not found");
+    }
+    List<Note> notes = noteService.getNotesByUser(user);
+    model.addAttribute("notes", notes);
+    model.addAttribute("username", email);
+    return "notes";
     }
 
-    /**
-     * Обработка GET запроса на "/notes/new" (форма создания новой заметки)
-     *
-     * @param model Модель Spring MVC для передачи данных в представление
-     * @return Логическое имя представления "note-form.html"
-     */
     @GetMapping("/new")
     public String showNewNoteForm(Model model) {
         model.addAttribute("note", new Note());
         return "note-form";
     }
 
-    /**
-     * Обработка POST запроса на "/notes" (сохранение новой заметки)
-     *
-     * @param note Объект Note из формы создания заметки
-     * @return Перенаправление на "/notes" (список всех заметок)
-     */
     @PostMapping
     public String saveNote(@ModelAttribute Note note) {
         // Получаем аутентификацию из контекста безопасности
@@ -94,19 +82,29 @@ public class NoteController {
         // Перенаправляем на страницу с заметками
         return "redirect:/notes";
     }
-    /**
-     * Обработка GET запроса на "/notes/{id}" (получение конкретной заметки по id)
-     *
-     * @param id Идентификатор заметки
-     * @param model Модель Spring MVC для передачи данных в представление
-     * @return Логическое имя представления "note-details.html"
-     */
+
     @GetMapping("/{id}")
-    public String getNoteById(@PathVariable Long id, Model model) {
-        Note note = noteService.getNoteById(id);
-        model.addAttribute("note", note);
-        return "note-details"; 
+    public String getNoteById(@PathVariable Long id, Model model) throws AccessDeniedException {
+    Note note = noteService.getNoteById(id);
+    
+    // Получаем текущего пользователя
+    Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+    UserDetails userDetails = userService.loadUserByUsername(authentication.getName());
+    String email = userDetails.getUsername();
+    User user = userRepository.findByEmail(email);
+    if (user == null) {
+        throw new UsernameNotFoundException("User not found");
     }
+
+    // Проверяем, что заметка принадлежит текущему пользователю
+    if (!note.getUser().equals(user)) {
+        throw new AccessDeniedException("You do not have permission to access this note");
+    }
+
+    model.addAttribute("note", note);
+    return "note-details"; 
+}
+
 
     /**
      * Обработка GET запроса на "/notes/{id}/edit" (форма редактирования заметки)

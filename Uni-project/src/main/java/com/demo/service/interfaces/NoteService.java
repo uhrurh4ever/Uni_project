@@ -6,6 +6,7 @@ package com.demo.service.interfaces;
 import java.util.List;
 
 import com.demo.model.Note;
+import com.demo.model.User;
 
 public interface NoteService {
 
@@ -18,4 +19,6 @@ public interface NoteService {
   Note updateNote(Note note);
 
   void deleteNoteById(Long id);
+
+  List<Note> getNotesByUser(User user);
 }
